@@ -1,0 +1,14 @@
+# ignore all files in the target/ directory
+target/
+
+# no .classpath file
+.classpath
+
+# no .project file
+.project
+
+# no .springBeans file
+.springBeans
+
+# no all files in .settings/ directory
+.settings/
