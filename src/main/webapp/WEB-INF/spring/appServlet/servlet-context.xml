@@ -25,10 +25,20 @@
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
 	
-	<context:component-scan base-package="org.smu.blood" />
+	<context:component-scan base-package="org.smu.blood">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/> 
+	</context:component-scan>
 	
 	<!-- Default bean name is 'mongo' -->
-    <mongo:mongo-client host="localhost" port="27017"/>
-	
+    <mongo:mongo-client id="mongoClient" host="localhost" port="27017"/>
+ 	<mongo:db-factory id="mongoDbFactory" dbname="blood" mongo-client-ref="mongoClient"/>
+	<!-- define template bean -->
+	<beans:bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<beans:constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
+	</beans:bean>
+	<!--  MongoRepository 
+	<mongo:repositories base-package="org.smu.blood.database" mongo-template-ref="mongoTemplate"/> -->
+	<!--  for MongoExceptions from @Repository annotated classes -->
+	<beans:bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
 	
 </beans:beans>
