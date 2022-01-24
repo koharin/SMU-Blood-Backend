@@ -8,6 +8,6 @@ import org.smu.blood.database.User;
 public interface UserRepository extends MongoRepository<User, String>{
 	// query User
 	// userId는 unique한 _id(primary key)이기 때문에 userId로만 특정 User 검색 가능
-	@Autowired
-	public User findByUserId(String userId);
+	//@Autowired
+	//public User findById(String id);
 }

@@ -10,27 +10,29 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection="User")
 public class User {
 	@Id
-	private String userId; // _id로 지정
+	private String id; // _id로 지정
 	private String password;
 	private String nickname;
+	private int bloodType;
+	private boolean rhType;
 	
 	public User() {}
 	
-	public User(String userId, String password, String nickname) {
-		this.userId = userId;
+	public User(String userId, String password, String nickname, int bloodType, boolean rhType) {
+		this.id = userId;
 		this.password = password;
 		this.nickname = nickname;
+		this.bloodType = bloodType;
+		this.rhType = rhType;
 	}
-	public String getuserId() {
-		return userId;
-	}
-	public String getpassword() {
-		return password;
-	}
-	public String getnickname() {
-		return nickname;
-	}
+	
+	public String getid() { return id; }
+	public String getpassword() { return password; }
+	public String getnickname() { return nickname; }
+	public int getbloodType() { return bloodType; }
+	public boolean getrhType() {return rhType; }
+	
 	public String toString() {
-		return String.format("User[userId:%s, password: %s, nickname: %s]", userId, password, nickname);
+		return String.format("User[userId:%s, password: %s, nickname: %s, bloodType: %d, rhType: %b]", id, password, nickname, bloodType, rhType);
 	}
 }
