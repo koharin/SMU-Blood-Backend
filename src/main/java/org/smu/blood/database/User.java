@@ -1,6 +1,7 @@
 package org.smu.blood.database;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /*
@@ -11,9 +12,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class User {
 	@Id
 	private String id; // _id로 지정
+	@Indexed
 	private String password;
+	@Indexed
 	private String nickname;
+	@Indexed
 	private int bloodType;
+	@Indexed
 	private boolean rhType;
 	
 	public User() {}

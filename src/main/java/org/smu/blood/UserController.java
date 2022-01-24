@@ -2,6 +2,7 @@ package org.smu.blood;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -51,7 +52,8 @@ public class UserController {
 
 		System.out.println("[+] Connection from Android");
 		System.out.println("[+] " + user.toString());
-		
+		System.out.println("[+] Create user document in User collection");
+		mongoTemplate.insert(user, "User");
 		return "1";
 	}
 	
