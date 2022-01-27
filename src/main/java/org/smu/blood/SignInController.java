@@ -1,5 +1,6 @@
 package org.smu.blood;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import javax.servlet.http.HttpSession;
 
 @EnableMongoRepositories
 @RestController
@@ -27,10 +27,10 @@ public class SignInController {
 	private MongoTemplate mongoTemplate;
 	@PostMapping("signIn")
 	@ResponseBody
-	public User signInAuth(@RequestParam String id, @RequestParam String password) {
-		HttpSession session;
-		System.out.println("[+] id: " + id + ", password: " + password);
-		List<User> list = mongoTemplate.find(new Query(new Criteria("_id").is(id).and("password").is(password)), User.class, "User");
+	public User signInAuth(@RequestBody HashMap<String,String> loginInfo) {
+		
+		System.out.println("[+] id: " + loginInfo.get("id") + ", password: " + loginInfo.get("password"));
+		List<User> list = mongoTemplate.find(new Query(new Criteria("_id").is(loginInfo.get("id")).and("password").is(loginInfo.get("password"))), User.class, "User");
 		if(list.size() > 0) {
 			System.out.println("[+] Login Success");
 			System.out.println(list.get(0).toString());
