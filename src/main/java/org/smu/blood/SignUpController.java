@@ -39,14 +39,14 @@ public class SignUpController{
 		if(!result.containsKey("sameId") && !result.containsKey("sameNickname")) {
 			System.out.println("[+] create new user account.");
 			repository.insert(user);
-			result.put("sameId", 0);
-			result.put("sameNickname", 0);
+			//result.put("sameId", 0);
+			//result.put("sameNickname", 0);
 			result.put("create", 1);
-			return result;
+			//return result;
 		}
 		if(!result.containsKey("sameId")) result.put("sameId", 0);
 		if(!result.containsKey("sameNickname")) result.put("sameNickname", 0);
-		result.put("create", 0);
+		if(!result.containsKey("create"))result.put("create", 0);
 		return result;
 			
 		
