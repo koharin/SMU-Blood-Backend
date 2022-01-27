@@ -36,8 +36,8 @@
 	<beans:bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
 		<beans:constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
 	</beans:bean>
-	<!--  MongoRepository 
-	<mongo:repositories base-package="org.smu.blood.database" mongo-template-ref="mongoTemplate"/> -->
+	<!--  MongoRepository -->
+	<mongo:repositories base-package="org.smu.blood.database.*" />
 	<!--  for MongoExceptions from @Repository annotated classes -->
 	<beans:bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
 	

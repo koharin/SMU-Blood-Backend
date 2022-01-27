@@ -10,34 +10,32 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document(collection="User")
 public class User {
-	@Id
-	private String id; // _id로 지정
-	@Indexed
+	@Id private String id; // _id로 지정
 	private String password;
-	@Indexed
 	private String nickname;
-	@Indexed
 	private int bloodType;
-	@Indexed
 	private boolean rhType;
 	
 	public User() {}
 	
-	public User(String userId, String password, String nickname, int bloodType, boolean rhType) {
-		this.id = userId;
+	public User(String id, String password, String nickname, int bloodType, boolean rhType) {
+		this.id = id;
 		this.password = password;
 		this.nickname = nickname;
 		this.bloodType = bloodType;
 		this.rhType = rhType;
 	}
 	
-	public String getid() { return id; }
-	public String getpassword() { return password; }
-	public String getnickname() { return nickname; }
-	public int getbloodType() { return bloodType; }
-	public boolean getrhType() {return rhType; }
+	public String getId() { return id; }
+	public String getPassword() { return password; }
+	public String getNickname() { return nickname; }
+	public int getBloodType() { return bloodType; }
+	public boolean getRhType() {return rhType; }
+	
+	public void setPassword(String value) { this.password = value; }
+	public void setNickname(String value) { this.nickname = value; }
 	
 	public String toString() {
-		return String.format("User[userId:%s, password: %s, nickname: %s, bloodType: %d, rhType: %b]", id, password, nickname, bloodType, rhType);
+		return String.format("User[id:%s, password: %s, nickname: %s, bloodType: %d, rhType: %b]", id, password, nickname, bloodType, rhType);
 	}
 }
