@@ -2,27 +2,22 @@ package org.smu.blood;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 import org.smu.blood.database.User;
-import org.smu.blood.database.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @EnableMongoRepositories
 @RestController
 public class SignInController {
-	@Autowired
-	private UserRepository repository;
+	
 	@Autowired
 	private MongoTemplate mongoTemplate;
 	@PostMapping("signIn")
