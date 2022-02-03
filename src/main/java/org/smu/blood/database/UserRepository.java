@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface UserRepository extends MongoRepository<User, String>, CrudRepository<User, String>{
 	
 	Optional<User> findByNickname(String nickname);
+	Optional<User> findByIdAndPassword(String id, String password);
 }
