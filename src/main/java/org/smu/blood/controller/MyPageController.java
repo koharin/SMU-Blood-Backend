@@ -19,6 +19,24 @@ public class MyPageController {
 	UserRepository repository;
 	@Autowired
 	JWTService jwtService;
+	
+	// 내 아이디
+	@GetMapping("myPage/myId")
+	public String getMyId(@RequestHeader String token) {
+		System.out.println("[+] Connection from Android");
+		System.out.println("[+] token: " + token);
+		// token 유효성 검증
+		if(jwtService.checkTokenExp(token)) {
+			// token에서 사용자 id 가져오기
+			String userId = jwtService.getClaim(token).get("id").toString();
+			System.out.println("[+] userId from token: " + userId);
+			return userId;
+		}else {
+			System.out.println("[-] Invalid token");
+			return null;
+		}
+	}
+	
 	// 내 정보
 	@GetMapping("myPage/info")
 	public User getMyData(@RequestHeader String token) {
