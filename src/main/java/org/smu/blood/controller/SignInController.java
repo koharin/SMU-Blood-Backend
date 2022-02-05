@@ -12,8 +12,10 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @EnableMongoRepositories(basePackages="org.smu.blood")
@@ -25,9 +27,26 @@ public class SignInController {
 	@Autowired
 	JWTService jwtService;
 	
+	// 토큰 유효성 검증
+	@GetMapping("tokenValid")
+	public boolean tokenValid(@RequestHeader String token) {
+		System.out.println("[+] Check token validation from Android");
+		System.out.println("[+] token: " + token);
+		
+		if(jwtService.checkTokenExp(token)) { 
+			System.out.println("[+] Valid token");
+			return true; 
+		}
+		else {
+			System.out.println("[-] Invalid token");
+			return false;
+		}
+	}
+	
+	// 로그인
 	@PostMapping("signIn")
 	public User signInAuth(@RequestBody HashMap<String,String> loginInfo, HttpServletResponse response) {
-		System.out.println("[+] Connection from Android");
+		System.out.println("[+] Login authentication from Android");
 		
 		System.out.println("[+] id: " + loginInfo.get("id") + ", password: " + loginInfo.get("password") + ", AutoLogin: " + loginInfo.get("AutoLogin"));
 		List<User> list = mongoTemplate.find(new Query(new Criteria("_id").is(loginInfo.get("id")).and("password").is(loginInfo.get("password"))), User.class, "User");
