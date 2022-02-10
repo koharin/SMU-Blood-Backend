@@ -196,8 +196,14 @@ public class ReviewController {
 				System.out.println("[+] get editing review: " + review.toString());
 				Comment commentInfo = new Comment((int)commentRepository.count(), review.getReviewId(), requestInfo.get("commentNickname"), requestInfo.get("commentTime"), requestInfo.get("comment"));
 				System.out.println("[+] Add Comment: " + commentInfo.toString());
+				
 				// save review comment
 				commentRepository.insert(commentInfo);
+				
+				// review document에서 commentCount 업데이트
+				review.setCommentCount(commentRepository.findByReviewId(review.getReviewId()).size());
+				reviewRepository.save(review);
+				System.out.println("[+] update review: " + review.toString());
 				return true;
 			}else { // review 없는 경우
 				return false;
