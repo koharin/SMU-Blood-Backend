@@ -10,4 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface ReviewRepository extends MongoRepository<Review,String>, CrudRepository<Review,String>{
 	Review findByNicknameAndWriteTime(String nickname, String writeTime);
 	List<Review> findByNickname(String nickname);
+	Review findByReviewId(int reviewId);
 }

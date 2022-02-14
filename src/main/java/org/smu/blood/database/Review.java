@@ -15,8 +15,7 @@ public class Review {
 	private int commentCount;
 	
 	public Review() {}
-	public Review(int reviewId, String userId, String nickname, String title, String writeTime, String contents, int likeNum, int commentCount) {
-		this.reviewId = reviewId;
+	public Review(String userId, String nickname, String title, String writeTime, String contents, int likeNum, int commentCount) {
 		this.userId = userId;
 		this.nickname = nickname;
 		this.title = title;

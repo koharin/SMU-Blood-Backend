@@ -3,7 +3,6 @@ package org.smu.blood.controller;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.smu.blood.api.JWTService;
 import org.smu.blood.database.Comment;
@@ -13,12 +12,10 @@ import org.smu.blood.database.ReviewRepository;
 import org.smu.blood.database.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @EnableMongoRepositories(basePackages="org.smu.blood")
@@ -68,7 +65,7 @@ public class ReviewController {
 			// User document에서 nickname 가져오기
 			String userNickname = repository.findById(userId).get().getNickname();
 			
-			review.setReviewId((int) reviewRepository.count());
+			review.setReviewId((int) reviewRepository.count()+1);
 			review.setId(userId);
 			review.setNickname(userNickname);
 			System.out.println(review.toString());
@@ -90,31 +87,6 @@ public class ReviewController {
 		List<Review> list = reviewRepository.findAll();
 		for(int i=0; i<list.size(); i++) System.out.println("review["+i+"]: " + list.get(i).toString());
 		return list;
-	}
-	
-	// check if review nickname == my nickname
-	@PostMapping("review/checkReviewNickname")
-	public boolean checkMy(@RequestHeader String token, @RequestBody String reviewNickname) {
-		reviewNickname = reviewNickname.replaceAll("\"", "");
-		System.out.println("Check review nickname from Android");
-		if(jwtService.checkTokenExp(token)) {
-			// token에서 사용자 id 가져오기
-			String userId = jwtService.getClaim(token).get("id").toString();
-			System.out.println("[+] current id: " + userId);
-			
-			String currentNickname = repository.findById(userId).get().getNickname();
-			System.out.println("[+] current nickname: " + currentNickname + ", reviewNickname: " + reviewNickname);
-			
-			if(currentNickname.equals(reviewNickname)) {
-				System.out.println("[+] review writen by me");
-				return true;
-			}
-			System.out.println("[-] review writen by other");
-			return false;
-		}else {
-			System.out.println("[-] Invalid token");
-			return false;
-		}
 	}
 	
 	// edit my review
@@ -194,7 +166,7 @@ public class ReviewController {
 			
 			if(review != null) { 
 				System.out.println("[+] get editing review: " + review.toString());
-				Comment commentInfo = new Comment((int)commentRepository.count(), review.getReviewId(), requestInfo.get("commentNickname"), requestInfo.get("commentTime"), requestInfo.get("comment"));
+				Comment commentInfo = new Comment((int)commentRepository.count()+1, review.getReviewId(), requestInfo.get("commentNickname"), requestInfo.get("commentTime"), requestInfo.get("comment"));
 				System.out.println("[+] Add Comment: " + commentInfo.toString());
 				
 				// save review comment
@@ -224,5 +196,84 @@ public class ReviewController {
 		List<Comment> list = commentRepository.findByReviewId(review.getReviewId());
 		for(int i=0; i<list.size(); i++) System.out.println("Comment["+i+"]: " + list.get(i).toString());
 		return list;
+	}
+	
+	// edit comment
+	@PostMapping("review/editComment")
+	public boolean editComment(@RequestHeader String token, @RequestBody HashMap<String,String> editInfo) {
+		System.out.println("[+] edit comment from Android");
+		
+		if(jwtService.checkTokenExp(token)) {
+			//Comment comment = commentRepository.findByNicknameAndTime(editInfo.get("commentNickname").toString(), editInfo.get("writeTime").toString());
+			Comment comment = commentRepository.findByCommentId(Integer.parseInt(editInfo.get("commentId")));
+			
+			if(comment != null) {
+				System.out.println("[+] "+ comment);
+				comment.setComment(editInfo.get("editComment"));
+				comment.setTime(editInfo.get("editTime"));
+				// update comment document
+				commentRepository.save(comment);
+				System.out.println("[+] updated comment: " + comment);
+				return true;
+			}
+		}
+		System.out.println("[-] update failed");
+		return false;
+		
+	}
+	
+	// delete comment
+	@PostMapping("review/deleteComment")
+	public boolean deleteComment(@RequestHeader String token, @RequestBody HashMap<String,String> deleteInfo) {
+		System.out.println("[+] delete comment request from Android");
+		
+		if(jwtService.checkTokenExp(token)) {
+			//Comment comment = commentRepository.findByNicknameAndTime(deleteInfo.get("commentNickname").toString(), deleteInfo.get("commentTime").toString());
+			Comment comment = commentRepository.findByCommentId(Integer.parseInt(deleteInfo.get("commentId")));
+			
+			if(comment != null) {
+				System.out.println("[+] "+ comment);
+				int reviewId = comment.getReviewId();
+				
+				// delete comment document
+				commentRepository.delete(comment);
+				System.out.println("[+] comment deleted" );
+				
+				// decrease commentCount in review document and update review document
+				Review review = reviewRepository.findByReviewId(reviewId);
+				System.out.println("[+] " + review);
+				review.setCommentCount(review.getCommentCount()-1);
+				reviewRepository.save(review);
+				System.out.println("[+] updated review: " + review);
+				return true;
+			}
+		}
+		System.out.println("[-] comment deletion failed");
+		return false;
+	}
+	
+	// heart event
+	@PostMapping("review/heart")
+	public boolean heartEvent(@RequestHeader String token, @RequestBody HashMap<String,String> reviewInfo) {
+System.out.println("[+] heart event request from Android");
+		
+		if(jwtService.checkTokenExp(token)) {
+			Review review = reviewRepository.findByNicknameAndWriteTime(reviewInfo.get("reviewNickname"), reviewInfo.get("reviewTime"));
+			if(review != null) {
+				System.out.println("[+] " + review);
+				
+				// set new heart num
+				review.setLikeNum(Integer.parseInt(reviewInfo.get("reviewHeart")));
+				System.out.println("[+] Updated review: " + review);
+				
+				// save change in review document
+				reviewRepository.save(review);
+				System.out.println("[+] review updated with changed heartNum");
+				return true;
+			}
+		}
+		System.out.println("[+] heartNum change failed");
+		return false;
+		
 	}
 }
