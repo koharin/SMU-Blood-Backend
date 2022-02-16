@@ -68,7 +68,7 @@ public class ReviewController {
 			review.setReviewId((int) reviewRepository.count()+1);
 			review.setId(userId);
 			review.setNickname(userNickname);
-			System.out.println(review.toString());
+			System.out.println(review);
 			
 			// Review Collection에 사용자 글 document 넣기
 			reviewRepository.insert(review);
@@ -101,12 +101,12 @@ public class ReviewController {
 			Review review = reviewRepository.findByNicknameAndWriteTime(editInfo.get("nickname"), editInfo.get("originTime"));
 			
 			if(review != null) { 
-				System.out.println("[+] get editing review: " + review.toString());
+				System.out.println("[+] get editing review: " + review);
 				review.setTitle(editInfo.get("editTitle"));
 				review.setContents(editInfo.get("editContent"));
 				review.setWriteTime(editInfo.get("editTime"));
 				
-				System.out.println("[+] after editing review: " + review.toString());
+				System.out.println("[+] after editing review: " + review);
 				
 				// update review document with new title and contents
 				reviewRepository.save(review);
@@ -132,7 +132,7 @@ public class ReviewController {
 			Review review = reviewRepository.findByNicknameAndWriteTime(deleteInfo.get("nickname"), deleteInfo.get("writeTime"));
 			
 			if(review != null) { 
-				System.out.println("[+] get editing review: " + review.toString());
+				System.out.println("[+] get editing review: " + review);
 				
 				// delete review document from Review collection
 				reviewRepository.delete(review);
@@ -165,9 +165,9 @@ public class ReviewController {
 			Review review = reviewRepository.findByNicknameAndWriteTime(requestInfo.get("reviewNickname").toString(), requestInfo.get("reviewTime").toString());
 			
 			if(review != null) { 
-				System.out.println("[+] get editing review: " + review.toString());
+				System.out.println("[+] get editing review: " + review);
 				Comment commentInfo = new Comment((int)commentRepository.count()+1, review.getReviewId(), requestInfo.get("commentNickname"), requestInfo.get("commentTime"), requestInfo.get("comment"));
-				System.out.println("[+] Add Comment: " + commentInfo.toString());
+				System.out.println("[+] Add Comment: " + commentInfo);
 				
 				// save review comment
 				commentRepository.insert(commentInfo);
