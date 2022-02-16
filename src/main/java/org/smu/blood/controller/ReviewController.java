@@ -31,7 +31,7 @@ public class ReviewController {
 	JWTService jwtService;
 	
 	// get my nickname
-	@GetMapping("review/myNickname")
+	@GetMapping(value="review/myNickname", produces="application/json; charset=utf8")
 	public String getMyId(@RequestHeader String token) {
 		System.out.println("[+] Get my nickname from Android");
 		System.out.println("[+] token: " + token);
