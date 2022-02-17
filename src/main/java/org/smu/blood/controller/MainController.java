@@ -1,5 +1,6 @@
 package org.smu.blood.controller;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.smu.blood.api.JWTService;
@@ -60,22 +61,38 @@ public class MainController {
 
     // apply blood donation
     @PostMapping("main/apply")
-    public boolean bloodApply(@RequestHeader String token, @RequestBody Apply apply){
+    public boolean bloodApply(@RequestHeader String token, @RequestBody HashMap<String,String> applyInfo){
         System.out.println("[+] Apply Register from Android");
 
+        Apply apply = new Apply();
         if(jwtService.checkTokenExp(token)){
             // token에서 userId 가져오기
             String userId = jwtService.getClaim(token).get("id").toString();
             System.out.println("[+] userId from token: " + userId);
-
+            
+            // setting for apply info
             apply.setApplyId((int) applyRepository.count() + 1);
             apply.setUserId(userId);
-
-            System.out.println("[+] "+ apply);
-            // insert request document in Request collection
+            apply.setApplyDate(applyInfo.get("applyDate"));
+            apply.setRequestId(Integer.parseInt(applyInfo.get("requestId")));
+            System.out.println("[+] "+apply);
+            // insert apply into Apply Collection
             applyRepository.insert(apply);
-            return true;
+            
+           // increase applicantNum in request document
+            Request request = requestRepository.findByRequestId(Integer.parseInt(applyInfo.get("requestId")));
+            if( request != null) {
+            	System.out.println("[+] request info for apply(before update): " + request);
+            	request.setApplicantNum(request.getApplicantNum()+1);
+            	
+            	// update request document in Request collection
+            	requestRepository.save(request);
+            	System.out.println("[+] request info for apply(after update): " + request);
+        
+            	return true;
+            }
         }
         return false;
     }
+    
 }

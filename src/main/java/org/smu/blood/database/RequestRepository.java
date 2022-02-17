@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RequestRepository extends MongoRepository<Request, String>, CrudRepository<Request, String> {
-	
+	Request findByRequestId(int requestId);
 }

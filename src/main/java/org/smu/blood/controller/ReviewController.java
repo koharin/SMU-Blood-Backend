@@ -54,6 +54,7 @@ public class ReviewController {
 	// 글쓰기 등록
 	@PostMapping("review/write")
 	public Review reviewWrite(@RequestHeader String token, @RequestBody Review review) {
+		int id;
 		System.out.println("[+] Post user review from Android");
 		System.out.println("[+] token: " + token);
 		
@@ -65,7 +66,10 @@ public class ReviewController {
 			// User document에서 nickname 가져오기
 			String userNickname = repository.findById(userId).get().getNickname();
 			
-			review.setReviewId((int) reviewRepository.count()+1);
+			// reviewId에서 DuplicationKey exception 방지 위해 reviewId 설정, 나중에 더 좋은 방법으로 수정 필요
+			id = (int)reviewRepository.count()+1;
+			while(reviewRepository.findByReviewId(id) != null) id += 1;
+			review.setReviewId(id);
 			review.setId(userId);
 			review.setNickname(userNickname);
 			System.out.println(review);
@@ -166,7 +170,10 @@ public class ReviewController {
 			
 			if(review != null) { 
 				System.out.println("[+] get editing review: " + review);
-				Comment commentInfo = new Comment((int)commentRepository.count()+1, review.getReviewId(), requestInfo.get("commentNickname"), requestInfo.get("commentTime"), requestInfo.get("comment"));
+				// commentId에서 DuplicationKey exception 방지 위해 commentId 설정, 나중에 더 좋은 방법으로 수정 필요
+				int id = (int)commentRepository.count()+1;
+				while(commentRepository.findByCommentId(id) != null) id += 1;
+				Comment commentInfo = new Comment(id, review.getReviewId(), requestInfo.get("commentNickname"), requestInfo.get("commentTime"), requestInfo.get("comment"));
 				System.out.println("[+] Add Comment: " + commentInfo);
 				
 				// save review comment
