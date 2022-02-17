@@ -32,14 +32,14 @@
 	</context:component-scan>
 	
 	<!-- Default bean name is 'mongo' -->
-    <mongo:mongo-client id="mongoClient" host="192.168.35.186" port="27017"/>
+    <mongo:mongo-client id="mongoClient" host="localhost" port="27017"/>
  	<mongo:db-factory id="mongoDbFactory" dbname="blood" mongo-client-ref="mongoClient"/>
 	<!-- define template bean -->
 	<beans:bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
 		<beans:constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
 	</beans:bean>
 	<!--  MongoRepository -->
-	<mongo:repositories base-package="org.smu.blood.database" />
+	<mongo:repositories base-package="org.smu.blood.database.*" />
 	<!--  for MongoExceptions from @Repository annotated classes -->
 	<beans:bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
 </beans:beans>

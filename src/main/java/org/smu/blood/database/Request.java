@@ -3,14 +3,14 @@ package org.smu.blood.database;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
+@Document(collection="Request")
 public class Request {
     @Id private int requestId;
     private String userId;
     private int hospitalId;
     private int bloodType;
     private boolean rhType;
-    private int donationType; // 헌혈 종류
+    private String donationType; // 헌혈 종류
     private int wardNum;
     private String patientName;
     private int patientNum;
@@ -21,7 +21,9 @@ public class Request {
     private String story;
     private int applicantNum;
 
-    public Request(int requestId, String userId, int hospitalId, int bloodType, boolean rhType, int donationType, int wardNum, String patientName, int patientNum, String protectorContact, String startDate, String endDate, String registerTime, String story, int applicantNum){
+    public Request() {}
+    
+    public Request(int requestId, String userId, int hospitalId, int bloodType, boolean rhType, String donationType, int wardNum, String patientName, int patientNum, String protectorContact, String startDate, String endDate, String registerTime, String story, int applicantNum){
         this.requestId = requestId;
         this.userId = userId;
         this.hospitalId = hospitalId;
@@ -39,6 +41,38 @@ public class Request {
         this.applicantNum = applicantNum;
     }
 
+    public int getRequestId() { return requestId; }
+    public String getUserId() { return userId; }
+    public int getHospitalId( ){ return hospitalId; }
+    public int getBloodType() { return bloodType; }
+    public boolean getRhType() { return rhType; }
+    public String getDonationType() { return donationType; }
+    public int getWardNum() { return wardNum; }
+    public String getPatientName() { return patientName; }
+    public int getPatientNum() { return patientNum; }
+    public String getProtectorContact() { return protectorContact; }
+    public String getStartDate() { return startDate; }
+    public String getEndDate() { return endDate; }
+    public String getRegisterTime() { return registerTime; }
+    public String getStory() { return story; }
+    public int getApplicantNum() { return applicantNum; }
+    
+    public void setRequestId(int value){ requestId = value; }
     public void setUserId(String value){ userId = value; }
+    public void setHospitalId(int value) { hospitalId = value; }
+    public void setBloodType(int value) { bloodType = value; }
+    public void setRhType(boolean value) { rhType = value; }
+    public void setDonationType(String value) { donationType = value; }
+    public void setWardNum(int value) { wardNum = value; }
+    public void setPatientName(String value) { patientName = value; }
+    public void setPatientNum(int value) { patientNum = value; }
+    public void setProtectorContact(String value) { protectorContact = value; }
+    public void setStartDate(String value) { startDate = value; }
+    public void setEndDate(String value) { endDate = value; }
+    public void setRegisterTime(String value) { registerTime = value; }
+    public void setStory(String value) { story = value; }
+    public void setApplicantNum(int value) { applicantNum = value; }
+    
+    public String toString() { return String.format("Request[requestId: %d. userId: %s, hospitalId: %d, bloodType: %d, rhType: %b, donationType: %s, wardNum: %d, patientName: %s, patientNum: %d, protectorContact: %s, startDate: %s, endDate: %s, registerTime: %s, story: %s, applicantNum: %d]", requestId,userId,hospitalId,bloodType,rhType,donationType,wardNum,patientName,patientNum,protectorContact,startDate,endDate,registerTime,story,applicantNum); }
 
 }
