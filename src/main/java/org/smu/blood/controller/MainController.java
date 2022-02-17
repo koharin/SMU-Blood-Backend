@@ -48,9 +48,9 @@ public class MainController {
         return false;
     }
     
-    // get list of request
+    // get all list of request
     @GetMapping("main/list")
-    public List<Request> requestList(){
+    public List<Request> allRequestList(){
     	System.out.println("[+] Get list of request from Android");
     	
     	List<Request> list = requestRepository.findAll();
@@ -95,4 +95,66 @@ public class MainController {
         return false;
     }
     
+    //get my request list
+    @GetMapping("main/myRequest/myRequestList")
+    public List<Request> requestList(@RequestHeader String token){
+    	System.out.println("[+] Get my request list from Android");
+    	
+    	if(jwtService.checkTokenExp(token)){
+            // token에서 userId 가져오기
+            String userId = jwtService.getClaim(token).get("id").toString();
+            System.out.println("[+] userId from token: " + userId);
+            
+            // find request list by userId
+            List<Request> requestlist = requestRepository.findByUserId(userId);
+            for(int i=0; i<requestlist.size(); i++) System.out.println("[+] Request["+i+"]: " + requestlist.get(i));
+            
+            return requestlist;
+    	}
+    	
+    	return null;
+    }
+    
+    // get apply list of my request
+    @PostMapping("main/myRequest/applyList")
+    public List<Apply> applyOfMyRequest(@RequestBody int requestId){
+    	System.out.println("[+] Get apply list of my request from Android");
+    	
+    	List<Apply> applylist = applyRepository.findByRequestId(requestId);
+    	for(int i=0; i<applylist.size(); i++) System.out.println("[+] Apply["+i+"]: " + applylist.get(i));
+    	
+    	return applylist;
+    }
+    
+    // get my apply list
+    @GetMapping("main/myApply/myApplyList")
+    public List<Apply> applyList(@RequestHeader String token){
+    	System.out.println("[+] Get my apply list from Android");
+    	
+        if(jwtService.checkTokenExp(token)){
+            // token에서 userId 가져오기
+            String userId = jwtService.getClaim(token).get("id").toString();
+            System.out.println("[+] userId from token: " + userId);
+            
+            // find apply list by userId
+            List<Apply> applyList = applyRepository.findByUserId(userId);
+            for(int i=0; i<applyList.size(); i++) System.out.println("[+] Apply["+i+"]: " + applyList.get(i));
+            
+            return applyList;
+        }else {
+        	return null;
+        }
+    }
+    
+    // get request of my apply
+    @PostMapping("main/myApply/request")
+    public Request requestOfMyApply(@RequestBody int requestId){
+    	System.out.println("[+] Get request of my apply from Android");
+    	Request requestInfo = requestRepository.findByRequestId(requestId);
+    	System.out.println("[+] request info of my apply: " + requestInfo.toString());
+    	
+    	return requestInfo;
+    }
+   
+       
 }
