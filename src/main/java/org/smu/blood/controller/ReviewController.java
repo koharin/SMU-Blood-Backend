@@ -8,6 +8,8 @@ import org.smu.blood.api.JWTService;
 import org.smu.blood.database.Comment;
 import org.smu.blood.database.CommentRepository;
 import org.smu.blood.database.Review;
+import org.smu.blood.database.ReviewLike;
+import org.smu.blood.database.ReviewLikeRepository;
 import org.smu.blood.database.ReviewRepository;
 import org.smu.blood.database.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,8 @@ public class ReviewController {
 	ReviewRepository reviewRepository;
 	@Autowired
 	CommentRepository commentRepository;
+	@Autowired
+	ReviewLikeRepository reviewLikeRepository;
 	@Autowired
 	JWTService jwtService;
 	
@@ -102,7 +106,7 @@ public class ReviewController {
 			System.out.println("[+] current id: " + userId);
 			
 			// find review document by editing review's nickname and writeTime
-			Review review = reviewRepository.findByNicknameAndWriteTime(editInfo.get("nickname"), editInfo.get("originTime"));
+			Review review = reviewRepository.findByReviewId(Integer.parseInt(editInfo.get("reviewId")));
 			
 			if(review != null) { 
 				System.out.println("[+] get editing review: " + review);
@@ -133,7 +137,7 @@ public class ReviewController {
 			System.out.println("[+] current id: " + userId);
 			
 			// find review document by editing review's nickname and writeTime
-			Review review = reviewRepository.findByNicknameAndWriteTime(deleteInfo.get("nickname"), deleteInfo.get("writeTime"));
+			Review review = reviewRepository.findByReviewId(Integer.parseInt(deleteInfo.get("reviewId")));
 			
 			if(review != null) { 
 				System.out.println("[+] get editing review: " + review);
@@ -166,7 +170,7 @@ public class ReviewController {
 		System.out.println("[+] save review comment from Android");
 			
 		if(jwtService.checkTokenExp(token)) {
-			Review review = reviewRepository.findByNicknameAndWriteTime(requestInfo.get("reviewNickname").toString(), requestInfo.get("reviewTime").toString());
+			Review review = reviewRepository.findByReviewId(Integer.parseInt(requestInfo.get("reviewId")));
 			
 			if(review != null) { 
 				System.out.println("[+] get editing review: " + review);
@@ -211,7 +215,6 @@ public class ReviewController {
 		System.out.println("[+] edit comment from Android");
 		
 		if(jwtService.checkTokenExp(token)) {
-			//Comment comment = commentRepository.findByNicknameAndTime(editInfo.get("commentNickname").toString(), editInfo.get("writeTime").toString());
 			Comment comment = commentRepository.findByCommentId(Integer.parseInt(editInfo.get("commentId")));
 			
 			if(comment != null) {
@@ -262,17 +265,40 @@ public class ReviewController {
 	// heart event
 	@PostMapping("review/heart")
 	public boolean heartEvent(@RequestHeader String token, @RequestBody HashMap<String,String> reviewInfo) {
-System.out.println("[+] heart event request from Android");
+		System.out.println("[+] heart event request from Android");
 		
 		if(jwtService.checkTokenExp(token)) {
-			Review review = reviewRepository.findByNicknameAndWriteTime(reviewInfo.get("reviewNickname"), reviewInfo.get("reviewTime"));
+			// token에서 사용자 id 가져오기
+			String userId = jwtService.getClaim(token).get("id").toString();
+			System.out.println("[+] current id: " + userId);
+						
+			Review review = reviewRepository.findByReviewId(Integer.parseInt(reviewInfo.get("boardId")));
 			if(review != null) {
 				System.out.println("[+] " + review);
 				
-				// set new heart num
-				review.setLikeNum(Integer.parseInt(reviewInfo.get("reviewHeart")));
-				System.out.println("[+] Updated review: " + review);
-				
+				// save reviewLike in ReviewLike collection
+				ReviewLike reviewLike = reviewLikeRepository.findByReviewIdAndUserId(review.getReviewId(), userId);
+				if(reviewLike != null) {
+					System.out.println("[+] get reviewLike: " + reviewLike.toString());
+					// 이미 true일 때는 새로 들어온 state가 false일 때만 likeNum 변화
+					if((reviewLike.getHeartState() == true) && (Boolean.parseBoolean(reviewInfo.get("heartState")) == false)) 
+						review.setLikeNum(review.getLikeNum()-1);
+					
+					reviewLike.setHeartState(Boolean.parseBoolean(reviewInfo.get("heartState")));
+				}else {
+					reviewLike = new ReviewLike((int)reviewLikeRepository.count()+1, review.getReviewId(), userId, Boolean.parseBoolean(reviewInfo.get("heartState")));
+					if(Boolean.parseBoolean(reviewInfo.get("heartState"))) {
+						
+						// increase heart num
+						review.setLikeNum(review.getLikeNum()+1);
+						System.out.println("[+] Updated review: " + review);
+					}
+				}
+				// set heartState of ReviewLike document
+				System.out.println("[+] updated reviewLike: " + reviewLike.toString());
+			
+				// update reviewLike document
+				reviewLikeRepository.save(reviewLike);
 				// save change in review document
 				reviewRepository.save(review);
 				System.out.println("[+] review updated with changed heartNum");
@@ -282,5 +308,25 @@ System.out.println("[+] heart event request from Android");
 		System.out.println("[+] heartNum change failed");
 		return false;
 		
+	}
+	
+	@PostMapping("review/getHeartState")
+	public ReviewLike getHeartState(@RequestHeader String token, @RequestBody int reviewId) {
+		System.out.println("[+] get heartState request from Android");
+		
+		if(jwtService.checkTokenExp(token)) {
+			// token에서 사용자 id 가져오기
+			String userId = jwtService.getClaim(token).get("id").toString();
+			System.out.println("[+] current id: " + userId);
+			
+			// find ReviewLike document by reviewId and userId
+			ReviewLike reviewLike = reviewLikeRepository.findByReviewIdAndUserId(reviewId, userId);
+			if(reviewLike != null) {
+				System.out.println("[+] get reviewLike: " + reviewLike.toString());
+				return reviewLike;
+			}
+		}
+		System.out.println("[-] no heart state or user authentication failed");
+		return null;
 	}
 }
