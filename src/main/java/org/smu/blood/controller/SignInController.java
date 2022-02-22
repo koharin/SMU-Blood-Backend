@@ -2,11 +2,13 @@ package org.smu.blood.controller;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.smu.blood.api.JWTService;
 import org.smu.blood.database.User;
+import org.smu.blood.database.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -25,10 +27,12 @@ public class SignInController {
 	@Autowired
 	private MongoTemplate mongoTemplate;
 	@Autowired
+	private UserRepository userRepository;
+	@Autowired
 	JWTService jwtService;
 	
 	// 토큰 유효성 검증
-	@GetMapping("tokenValid")
+	@GetMapping("signIn/tokenValid")
 	public boolean tokenValid(@RequestHeader String token) {
 		System.out.println("[+] Check token validation from Android");
 		System.out.println("[+] token: " + token);
@@ -44,7 +48,7 @@ public class SignInController {
 	}
 	
 	// 로그인
-	@PostMapping("signIn")
+	@PostMapping("signIn/general")
 	public User signInAuth(@RequestBody HashMap<String,String> loginInfo, HttpServletResponse response) {
 		System.out.println("[+] Login authentication from Android");
 		
@@ -64,6 +68,27 @@ public class SignInController {
 		}else {
 			System.out.println("[+] Login Failed");
 			return null; 
+		}
+	}
+	
+	// 로그인 (구글 연동 시)
+	@PostMapping("signIn/google")
+	public User gSignInAuth(@RequestBody HashMap<String,String> loginInfo, HttpServletResponse response) {
+		System.out.println("[+] Login authentication(google) from Android");
+		
+		if(userRepository.findById(loginInfo.get("id")).equals(Optional.empty())) {
+			System.out.println("[+] Login Failed");
+			return null;
+		}else {
+			User user = userRepository.findById(loginInfo.get("id")).get();
+			System.out.println("[+] " + user.toString());
+			// 앱 내 자원 사용 위한 token 발급
+			String token = jwtService.createToken(user, loginInfo.get("AutoLogin"));
+			System.out.println("token: " + token);
+			// HTTP 헤더에 token 넢기
+			response.setHeader("jwt-token", token); 
+			
+			return user;
 		}
 	}
 }
