@@ -20,10 +20,11 @@ public class Request {
     private String registerTime;
     private String story;
     private int applicantNum;
+    private boolean state;
 
     public Request() {}
     
-    public Request(int requestId, String userId, int hospitalId, int bloodType, boolean rhType, String donationType, int wardNum, String patientName, int patientNum, String protectorContact, String startDate, String endDate, String registerTime, String story, int applicantNum){
+    public Request(int requestId, String userId, int hospitalId, int bloodType, boolean rhType, String donationType, int wardNum, String patientName, int patientNum, String protectorContact, String startDate, String endDate, String registerTime, String story, int applicantNum, boolean state){
         this.requestId = requestId;
         this.userId = userId;
         this.hospitalId = hospitalId;
@@ -39,6 +40,7 @@ public class Request {
         this.registerTime = registerTime;
         this.story = story;
         this.applicantNum = applicantNum;
+        this.state = state;
     }
 
     public int getRequestId() { return requestId; }
@@ -56,6 +58,7 @@ public class Request {
     public String getRegisterTime() { return registerTime; }
     public String getStory() { return story; }
     public int getApplicantNum() { return applicantNum; }
+    public boolean getState() { return state; }
     
     public void setRequestId(int value){ requestId = value; }
     public void setUserId(String value){ userId = value; }
@@ -72,7 +75,8 @@ public class Request {
     public void setRegisterTime(String value) { registerTime = value; }
     public void setStory(String value) { story = value; }
     public void setApplicantNum(int value) { applicantNum = value; }
+    public void setState(boolean value) { state = value; }
     
-    public String toString() { return String.format("Request[requestId: %d. userId: %s, hospitalId: %d, bloodType: %d, rhType: %b, donationType: %s, wardNum: %d, patientName: %s, patientNum: %d, protectorContact: %s, startDate: %s, endDate: %s, registerTime: %s, story: %s, applicantNum: %d]", requestId,userId,hospitalId,bloodType,rhType,donationType,wardNum,patientName,patientNum,protectorContact,startDate,endDate,registerTime,story,applicantNum); }
+    public String toString() { return String.format("Request[requestId: %d. userId: %s, hospitalId: %d, bloodType: %d, rhType: %b, donationType: %s, wardNum: %d, patientName: %s, patientNum: %d, protectorContact: %s, startDate: %s, endDate: %s, registerTime: %s, story: %s, applicantNum: %d, state: %b]", requestId,userId,hospitalId,bloodType,rhType,donationType,wardNum,patientName,patientNum,protectorContact,startDate,endDate,registerTime,story,applicantNum, state); }
 
 }

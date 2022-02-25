@@ -2,6 +2,7 @@ package org.smu.blood.controller;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.smu.blood.api.JWTService;
 import org.smu.blood.database.Apply;
@@ -29,7 +30,7 @@ public class MainController {
     @Autowired
     UserRepository userRepository;
 
-    // get Request Register request
+    // Request Register request
     @PostMapping("main/registerRequest")
     public boolean bloodRequest(@RequestHeader String token, @RequestBody Request request){
         System.out.println("[+] Request Register");
@@ -64,7 +65,7 @@ public class MainController {
 
     // apply blood donation
     @PostMapping("main/apply")
-    public boolean bloodApply(@RequestHeader String token, @RequestBody HashMap<String,String> applyInfo){
+    public int bloodApply(@RequestHeader String token, @RequestBody HashMap<String,String> applyInfo){
         System.out.println("[+] Apply Register request from Android");
 
         Apply apply = new Apply();
@@ -72,6 +73,12 @@ public class MainController {
             // token에서 userId 가져오기
             String userId = jwtService.getClaim(token).get("id").toString();
             System.out.println("[+] userId from token: " + userId);
+            
+            // if same requestId, userId in apply collection, reject
+            if(applyRepository.findByRequestIdAndUserId(Integer.parseInt(applyInfo.get("requestId")), userId) != null) {
+            	System.out.println("[-] Already apply in this request");
+            	return 401;
+            }
             
             // setting for apply info
             apply.setApplyId((int) applyRepository.count() + 1);
@@ -92,10 +99,10 @@ public class MainController {
             	requestRepository.save(request);
             	System.out.println("[+] request info for apply(after update): " + request);
         
-            	return true;
+            	return 200;
             }
         }
-        return false;
+        return 400;
     }
     
     //get my request list

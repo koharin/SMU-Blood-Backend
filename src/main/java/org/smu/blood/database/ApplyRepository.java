@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ApplyRepository extends MongoRepository<Apply, String>, CrudRepository<Apply, String> {
+	
 	List<Apply> findByUserId(String userId);
 	List<Apply> findByRequestId(int requestId);
+	Apply findByRequestIdAndUserId(int requestId, String userId);
 }
