@@ -1,9 +1,8 @@
 package org.smu.blood.controller;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -56,24 +55,26 @@ public class MainController {
     public List<Request> allRequestList() {
     	System.out.println("[+] Get list of request");
 
-        DateFormat format = new SimpleDateFormat("yyyyMMdd");
         List<Request> list = requestRepository.findAll();
-        List<Request> result = null;
+        List<Request> result = new ArrayList<>();
 
     	try{
-            Date currentDate = format.parse(LocalTime.now().toString());
+    		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+            Date currentDate = new Date();
+            
             System.out.println("[+] current Date: " + currentDate);
 
             for (Request request : list) {
                 Date endDate = format.parse(request.getEndDate());
+                System.out.println("[+] request end date: " + endDate);
                 if (!endDate.before(currentDate))
                     result.add(request);
             }
-        } catch (NullPointerException | ParseException e){
-            e.printStackTrace();
-        } finally {
             return result;
+        } catch (ParseException e){
+            e.printStackTrace();
         }
+		return result; 
     }
 
     // apply blood donation
