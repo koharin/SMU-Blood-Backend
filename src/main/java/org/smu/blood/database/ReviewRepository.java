@@ -1,6 +1,7 @@
 package org.smu.blood.database;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.CrudRepository;
@@ -11,4 +12,5 @@ public interface ReviewRepository extends MongoRepository<Review,String>, CrudRe
 	Review findByNicknameAndWriteTime(String nickname, String writeTime);
 	List<Review> findByNickname(String nickname);
 	Review findByReviewId(int reviewId);
+	Optional<Review> findByReviewIdAndUserId(int reviewId, String userId);
 }

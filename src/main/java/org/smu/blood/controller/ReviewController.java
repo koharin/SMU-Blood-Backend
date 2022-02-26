@@ -3,6 +3,7 @@ package org.smu.blood.controller;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.smu.blood.api.JWTService;
 import org.smu.blood.database.Comment;
@@ -140,14 +141,16 @@ public class ReviewController {
 	
 	//delete my review
 	@PostMapping("review/delete")
-	public boolean reviewDelete(@RequestHeader String token, @RequestBody HashMap<String,String> deleteInfo) {
+	public boolean reviewDelete(@RequestHeader String token, @RequestBody int reviewId) {
+		System.out.println("[+] delete my review request from android (1)");
+		
 		if(jwtService.checkTokenExp(token)) {
 			// token에서 사용자 id 가져오기
 			String userId = jwtService.getClaim(token).get("id").toString();
 			System.out.println("[+] current id: " + userId);
 			
 			// find review document by editing review's nickname and writeTime
-			Review review = reviewRepository.findByReviewId(Integer.parseInt(deleteInfo.get("reviewId")));
+			Review review = reviewRepository.findByReviewId(reviewId);
 			
 			if(review != null) { 
 				System.out.println("[+] get editing review: " + review);
@@ -162,6 +165,33 @@ public class ReviewController {
 			System.out.println("[-] Invalid token");
 			return false;
 		}
+	}
+	
+	// check if my review before delete
+	@PostMapping("review/deleteAuth")
+	public boolean myReviewDelete(@RequestHeader String token, @RequestBody int reviewId) {
+		System.out.println("[+] check my review request before delete from android");
+		
+		if(jwtService.checkTokenExp(token)) {
+			// token에서 사용자 id 가져오기
+			String userId = jwtService.getClaim(token).get("id").toString();
+			System.out.println("[+] current id: " + userId);
+			
+			// find review document by reviewId and userId
+			Optional<Review> opReview = reviewRepository.findByReviewIdAndUserId(reviewId, userId);
+			if(opReview.isPresent()) {
+				Review review = opReview.get();
+				System.out.println("[+] my review: " + review);
+				
+				return true;
+			}else {
+				System.out.println("[-] Unable to delete other's review (not my review)");
+			}
+		}else {
+			System.out.println("[-] Invalid token");
+		}
+		// review auth error or invalid token
+		return false;
 	}
 	
 	// get only my review list
@@ -248,7 +278,6 @@ public class ReviewController {
 		System.out.println("[+] delete comment request from Android");
 		
 		if(jwtService.checkTokenExp(token)) {
-			//Comment comment = commentRepository.findByNicknameAndTime(deleteInfo.get("commentNickname").toString(), deleteInfo.get("commentTime").toString());
 			Comment comment = commentRepository.findByCommentId(Integer.parseInt(deleteInfo.get("commentId")));
 			
 			if(comment != null) {
