@@ -22,7 +22,7 @@ public class SignUpController{
 	// 회원가입
 	@PostMapping("signUp")
 	private HashMap<String, Integer> SignUp(@RequestBody User user){
-		HashMap<String,Integer> result = new HashMap<String, Integer>();
+		HashMap<String,Integer> result = new HashMap<>();
 		System.out.println("[+] Connection from Android");
 		System.out.println("[+] " + user.toString());
 		// id 중복 체크

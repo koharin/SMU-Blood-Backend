@@ -45,14 +45,19 @@ public class ReviewController {
 			// token에서 사용자 id 가져오기
 			String userId = jwtService.getClaim(token).get("id").toString();
 			System.out.println("[+] userId from token: " + userId);
-			
-			String userNickname = repository.findById(userId).get().getNickname();
-			System.out.println("[+] userNickname: " + userNickname);
-			return userNickname;
+			// userId로 User document 있는 경우
+			if(repository.findById(userId).isPresent()){
+				String userNickname = repository.findById(userId).get().getNickname();
+				System.out.println("[+] userNickname: " + userNickname);
+
+				return userNickname;
+			} // 없는 경우
+			else System.out.println("[-] no user info");
 		}else {
 			System.out.println("[-] Invalid token");
-			return null;
 		}
+		// invalid token or no user info
+		return null;
 	}
 	
 	// 글쓰기 등록
@@ -66,25 +71,30 @@ public class ReviewController {
 		if(jwtService.checkTokenExp(token)) {
 			// token에서 사용자 id 가져오기
 			String userId = jwtService.getClaim(token).get("id").toString();
-			
-			// User document에서 nickname 가져오기
-			String userNickname = repository.findById(userId).get().getNickname();
-			
-			// reviewId에서 DuplicationKey exception 방지 위해 reviewId 설정, 나중에 더 좋은 방법으로 수정 필요
-			id = (int)reviewRepository.count()+1;
-			while(reviewRepository.findByReviewId(id) != null) id += 1;
-			review.setReviewId(id);
-			review.setId(userId);
-			review.setNickname(userNickname);
-			System.out.println(review);
-			
-			// Review Collection에 사용자 글 document 넣기
-			reviewRepository.insert(review);
-			return review;
+
+			if(repository.findById(userId).isPresent()){
+				// User document에서 nickname 가져오기
+				String userNickname = repository.findById(userId).get().getNickname();
+
+				// reviewId에서 DuplicationKey exception 방지 위해 reviewId 설정, 나중에 더 좋은 방법으로 수정 필요
+				id = (int)reviewRepository.count()+1;
+				while(reviewRepository.findByReviewId(id) != null) id += 1;
+
+				// review setting
+				review.setReviewId(id);
+				review.setId(userId);
+				review.setNickname(userNickname);
+				System.out.println(review);
+
+				// Review Collection에 사용자 글 document 넣기
+				reviewRepository.insert(review);
+				return review;
+			} else System.out.println("[-] no user info");
 		}else {
 			System.out.println("[-] Invalid token");
-			return null;
 		}
+		// invalid token or no user info
+		return null;
 	}
 	
 	// 모든 후기 가져오기
@@ -186,7 +196,7 @@ public class ReviewController {
 				// review document에서 commentCount 업데이트
 				review.setCommentCount(commentRepository.findByReviewId(review.getReviewId()).size());
 				reviewRepository.save(review);
-				System.out.println("[+] update review: " + review.toString());
+				System.out.println("[+] update review: " + review);
 				return true;
 			}else { // review 없는 경우
 				return false;
@@ -279,9 +289,10 @@ public class ReviewController {
 				// save reviewLike in ReviewLike collection
 				ReviewLike reviewLike = reviewLikeRepository.findByReviewIdAndUserId(review.getReviewId(), userId);
 				if(reviewLike != null) {
-					System.out.println("[+] get reviewLike: " + reviewLike.toString());
+					System.out.println("[+] get reviewLike: " + reviewLike);
+
 					// 이미 true일 때는 새로 들어온 state가 false일 때만 likeNum 변화
-					if((reviewLike.getHeartState() == true) && (Boolean.parseBoolean(reviewInfo.get("heartState")) == false)) 
+					if((reviewLike.getHeartState()) && (!Boolean.parseBoolean(reviewInfo.get("heartState"))))
 						review.setLikeNum(review.getLikeNum()-1);
 					
 					reviewLike.setHeartState(Boolean.parseBoolean(reviewInfo.get("heartState")));
@@ -295,7 +306,7 @@ public class ReviewController {
 					}
 				}
 				// set heartState of ReviewLike document
-				System.out.println("[+] updated reviewLike: " + reviewLike.toString());
+				System.out.println("[+] updated reviewLike: " + reviewLike);
 			
 				// update reviewLike document
 				reviewLikeRepository.save(reviewLike);
@@ -322,7 +333,7 @@ public class ReviewController {
 			// find ReviewLike document by reviewId and userId
 			ReviewLike reviewLike = reviewLikeRepository.findByReviewIdAndUserId(reviewId, userId);
 			if(reviewLike != null) {
-				System.out.println("[+] get reviewLike: " + reviewLike.toString());
+				System.out.println("[+] get reviewLike: " + reviewLike);
 				return reviewLike;
 			}
 		}

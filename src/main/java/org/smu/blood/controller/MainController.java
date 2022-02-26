@@ -1,15 +1,14 @@
 package org.smu.blood.controller;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
-
 import org.smu.blood.api.JWTService;
-import org.smu.blood.database.Apply;
-import org.smu.blood.database.ApplyRepository;
-import org.smu.blood.database.Request;
-import org.smu.blood.database.RequestRepository;
-import org.smu.blood.database.UserRepository;
+import org.smu.blood.database.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,7 +43,7 @@ public class MainController {
             request.setRequestId((int)requestRepository.count()+1);
             request.setUserId(userId);
 
-            System.out.println("[+] "+ request.toString());
+            System.out.println("[+] "+ request);
             // insert request document in Request collection
             requestRepository.insert(request);
             return true;
@@ -54,13 +53,27 @@ public class MainController {
     
     // get all list of request
     @GetMapping("main/list")
-    public List<Request> allRequestList(){
+    public List<Request> allRequestList() {
     	System.out.println("[+] Get list of request");
-    	
-    	List<Request> list = requestRepository.findAll();
-    	for(int i=0; i<list.size(); i++) System.out.println("[+] Request["+i+"]: " + list.get(i));
-    	
-    	return list;
+
+        DateFormat format = new SimpleDateFormat("yyyyMMdd");
+        List<Request> list = requestRepository.findAll();
+        List<Request> result = null;
+
+    	try{
+            Date currentDate = format.parse(LocalTime.now().toString());
+            System.out.println("[+] current Date: " + currentDate);
+
+            for (Request request : list) {
+                Date endDate = format.parse(request.getEndDate());
+                if (!endDate.before(currentDate))
+                    result.add(request);
+            }
+        } catch (NullPointerException | ParseException e){
+            e.printStackTrace();
+        } finally {
+            return result;
+        }
     }
 
     // apply blood donation

@@ -2,10 +2,7 @@ package org.smu.blood.controller;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
-
 import javax.servlet.http.HttpServletResponse;
-
 import org.smu.blood.api.JWTService;
 import org.smu.blood.database.User;
 import org.smu.blood.database.UserRepository;
@@ -76,12 +73,12 @@ public class SignInController {
 	public User gSignInAuth(@RequestBody HashMap<String,String> loginInfo, HttpServletResponse response) {
 		System.out.println("[+] Login authentication(google) from Android");
 		
-		if(userRepository.findById(loginInfo.get("id")).equals(Optional.empty())) {
+		if(!userRepository.findById(loginInfo.get("id")).isPresent()) {
 			System.out.println("[+] Login Failed");
 			return null;
 		}else {
 			User user = userRepository.findById(loginInfo.get("id")).get();
-			System.out.println("[+] " + user.toString());
+			System.out.println("[+] " + user);
 			// 앱 내 자원 사용 위한 token 발급
 			String token = jwtService.createToken(user, loginInfo.get("AutoLogin"));
 			System.out.println("token: " + token);
