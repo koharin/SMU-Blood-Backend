@@ -1,7 +1,13 @@
 package org.smu.blood.controller;
 
 import java.util.HashMap;
+import java.util.List;
+
 import org.smu.blood.api.JWTService;
+import org.smu.blood.database.Apply;
+import org.smu.blood.database.ApplyRepository;
+import org.smu.blood.database.Request;
+import org.smu.blood.database.RequestRepository;
 import org.smu.blood.database.User;
 import org.smu.blood.database.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +25,10 @@ public class MyPageController {
 	UserRepository repository;
 	@Autowired
 	JWTService jwtService;
+	@Autowired
+	RequestRepository requestRepository;
+	@Autowired
+	ApplyRepository applyRepository;
 	
 	// 내 아이디 가져오기
 	@GetMapping("myPage/myId")
@@ -121,4 +131,79 @@ public class MyPageController {
 		// invalid token or no user info to delete
 		return false;
 	}
+	//get my request list
+    @GetMapping("myPage/myRequest/myRequestList")
+    public List<Request> requestList(@RequestHeader String token){
+    	System.out.println("[+] Get my request list");
+    	
+    	if(jwtService.checkTokenExp(token)){
+            // token에서 userId 가져오기
+            String userId = jwtService.getClaim(token).get("id").toString();
+            System.out.println("[+] userId from token: " + userId);
+            
+            // find request list by userId
+            List<Request> requestlist = requestRepository.findByUserId(userId);
+            for(int i=0; i<requestlist.size(); i++) System.out.println("[+] Request["+i+"]: " + requestlist.get(i));
+            
+            return requestlist;
+    	}
+    	
+    	return null;
+    }
+    
+    // get apply list of my request
+    @PostMapping("myPage/myRequest/applyList")
+    public List<Apply> applyOfMyRequest(@RequestHeader String token, @RequestBody int requestId){
+    	System.out.println("[+] Get apply list of my request");
+    	
+    	if(jwtService.checkTokenExp(token)){
+            // token에서 userId 가져오기
+            String userId = jwtService.getClaim(token).get("id").toString();
+            System.out.println("[+] userId from token: " + userId);
+            
+            List<Apply> applylist = applyRepository.findByRequestId(requestId);
+        	for(int i=0; i<applylist.size(); i++) System.out.println("[+] Apply["+i+"]: " + applylist.get(i));
+        	
+        	return applylist;
+    	}
+    	return null;
+    }
+    
+    // get my apply list
+    @GetMapping("myPage/myApply/myApplyList")
+    public List<Apply> applyList(@RequestHeader String token){
+    	System.out.println("[+] Get my apply list request from Android");
+    	
+        if(jwtService.checkTokenExp(token)){
+            // token에서 userId 가져오기
+            String userId = jwtService.getClaim(token).get("id").toString();
+            System.out.println("[+] userId from token: " + userId);
+            
+            // find apply list by userId
+            List<Apply> applyList = applyRepository.findByUserId(userId);
+            for(int i=0; i<applyList.size(); i++) System.out.println("[+] Apply["+i+"]: " + applyList.get(i));
+            
+            return applyList;
+        }else {
+        	return null;
+        }
+    }
+    
+    // get request of my apply
+    @PostMapping("myPage/myApply/request")
+    public Request requestOfMyApply(@RequestHeader String token, @RequestBody int requestId){
+    	System.out.println("[+] Get request of my apply request from Android");
+    	
+    	if(jwtService.checkTokenExp(token)){
+            // token에서 userId 가져오기
+            String userId = jwtService.getClaim(token).get("id").toString();
+            System.out.println("[+] userId from token: " + userId);
+            
+            Request requestInfo = requestRepository.findByRequestId(requestId);
+        	System.out.println("[+] request info of my apply: " + requestInfo.toString());
+        	
+        	return requestInfo;
+    	}
+    	return null;
+    }
 }
