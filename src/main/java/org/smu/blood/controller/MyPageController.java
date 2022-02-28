@@ -199,11 +199,41 @@ public class MyPageController {
             String userId = jwtService.getClaim(token).get("id").toString();
             System.out.println("[+] userId from token: " + userId);
             
-            Request requestInfo = requestRepository.findByRequestId(requestId);
-        	System.out.println("[+] request info of my apply: " + requestInfo.toString());
-        	
-        	return requestInfo;
+            if(requestRepository.findByRequestId(requestId).isPresent()) {
+            	Request requestInfo = requestRepository.findByRequestId(requestId).get();
+            	System.out.println("[+] request info of my apply: " + requestInfo.toString());
+            	
+            	return requestInfo;
+            }else {
+            	System.out.println("[-] no request info");
+            }
     	}
+    	// no request info present or invalid token
     	return null;
+    }
+    
+    // request end
+    @PostMapping("myPage/request/end")
+    public int requestEnd(@RequestHeader String token, @RequestBody int requestId) {
+    	System.out.println("[+] Set request state to false for request end request");
+    	if(jwtService.checkTokenExp(token)){
+            // token에서 userId 가져오기
+            String userId = jwtService.getClaim(token).get("id").toString();
+            System.out.println("[+] userId from token: " + userId);
+            
+            if(requestRepository.findByRequestId(requestId).isPresent()) {
+            	Request requestInfo = requestRepository.findByRequestId(requestId).get();
+            	System.out.println("[+] request info of my apply: " + requestInfo.toString());
+            	
+            	// set state to false and update change
+            	requestInfo.setState(false);
+            	requestRepository.save(requestInfo);
+            	
+            	return 200;
+            }else {
+            	System.out.println("[-] no request info");
+            }
+    	}
+    	return 400;
     }
 }

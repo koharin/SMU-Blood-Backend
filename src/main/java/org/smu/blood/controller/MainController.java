@@ -68,7 +68,7 @@ public class MainController {
             for (Request request : list) {
                 Date endDate = format.parse(request.getEndDate());
                 System.out.println("[+] request end date: " + endDate);
-                if (!endDate.before(currentDate) && request.getState() != true)
+                if ((!endDate.before(currentDate)) && (request.getState() != false))
                     result.add(request);
                
             }
@@ -106,8 +106,9 @@ public class MainController {
             applyRepository.insert(apply);
             
            // increase applicantNum in request document
-            Request request = requestRepository.findByRequestId(Integer.parseInt(applyInfo.get("requestId")));
-            if( request != null) {
+            if(requestRepository.findByRequestId(Integer.parseInt(applyInfo.get("requestId"))).isPresent()) {
+            	Request request = requestRepository.findByRequestId(Integer.parseInt(applyInfo.get("requestId"))).get();
+            	
             	System.out.println("[+] request info for apply(before update): " + request);
             	request.setApplicantNum(request.getApplicantNum()+1);
             	
@@ -116,8 +117,11 @@ public class MainController {
             	System.out.println("[+] request info for apply(after update): " + request);
         
             	return 200;
+            }else {
+            	System.out.println("[-] no request info");
             }
         }
+        // no request info or invalid token
         return 400;
     }
        
