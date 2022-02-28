@@ -141,13 +141,20 @@ public class MainController {
     
     // get apply list of my request
     @PostMapping("main/myRequest/applyList")
-    public List<Apply> applyOfMyRequest(@RequestBody int requestId){
+    public List<Apply> applyOfMyRequest(@RequestHeader String token, @RequestBody int requestId){
     	System.out.println("[+] Get apply list of my request");
     	
-    	List<Apply> applylist = applyRepository.findByRequestId(requestId);
-    	for(int i=0; i<applylist.size(); i++) System.out.println("[+] Apply["+i+"]: " + applylist.get(i));
-    	
-    	return applylist;
+    	if(jwtService.checkTokenExp(token)){
+            // token에서 userId 가져오기
+            String userId = jwtService.getClaim(token).get("id").toString();
+            System.out.println("[+] userId from token: " + userId);
+            
+            List<Apply> applylist = applyRepository.findByRequestId(requestId);
+        	for(int i=0; i<applylist.size(); i++) System.out.println("[+] Apply["+i+"]: " + applylist.get(i));
+        	
+        	return applylist;
+    	}
+    	return null;
     }
     
     // get my apply list
@@ -172,12 +179,20 @@ public class MainController {
     
     // get request of my apply
     @PostMapping("main/myApply/request")
-    public Request requestOfMyApply(@RequestBody int requestId){
+    public Request requestOfMyApply(@RequestHeader String token, @RequestBody int requestId){
     	System.out.println("[+] Get request of my apply request from Android");
-    	Request requestInfo = requestRepository.findByRequestId(requestId);
-    	System.out.println("[+] request info of my apply: " + requestInfo.toString());
     	
-    	return requestInfo;
+    	if(jwtService.checkTokenExp(token)){
+            // token에서 userId 가져오기
+            String userId = jwtService.getClaim(token).get("id").toString();
+            System.out.println("[+] userId from token: " + userId);
+            
+            Request requestInfo = requestRepository.findByRequestId(requestId);
+        	System.out.println("[+] request info of my apply: " + requestInfo.toString());
+        	
+        	return requestInfo;
+    	}
+    	return null;
     }
        
 }
