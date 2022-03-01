@@ -41,6 +41,7 @@ public class MainController {
 
             request.setRequestId((int)requestRepository.count()+1);
             request.setUserId(userId);
+            request.setState(true);
 
             System.out.println("[+] "+ request);
             // insert request document in Request collection
@@ -124,5 +125,63 @@ public class MainController {
         // no request info or invalid token
         return 400;
     }
-       
+    // order request list by endDate
+    @GetMapping("main/list/endDate")
+    public List<Request> dateSort(){
+    	System.out.println("[+] request list order by endDate request from Android");
+    	
+    	List<Request> list = requestRepository.findByOrderByEndDateAsc(); // findAll(Sort.by(Sort.Direction.ASC, "endDate"))
+    	List<Request> result = new ArrayList<>();
+    	
+    	try{
+    		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+            Date currentDate = new Date();
+            
+            System.out.println("[+] current Date: " + currentDate);
+
+            // if endDate is not past and not request end, put request to result
+            for (Request request : list) {
+                Date endDate = format.parse(request.getEndDate());
+                System.out.println("[+] request end date: " + endDate);
+                if ((!endDate.before(currentDate)) && (request.getState() != false))
+                    result.add(request);
+               
+            }
+            for(Request req: result) System.out.println("[+] " + req);
+            return result;
+        } catch (ParseException e){
+            e.printStackTrace();
+        }
+		return result; 
+    
+    }
+    // order request list by applicantNum
+    @GetMapping("main/list/applicantNum")
+    public List<Request> applicantSort(){
+    	System.out.println("[+] request list order by applicantNum request from Android");
+    	
+    	List<Request> list = requestRepository.findByOrderByApplicantNumAsc(); // findAll(Sort.by(Sort.Direction.ASC, "applicantNum"))
+    	List<Request> result = new ArrayList<>();
+    	
+    	try{
+    		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+            Date currentDate = new Date();
+            
+            System.out.println("[+] current Date: " + currentDate);
+
+            // if endDate is not past and not request end, put request to result
+            for (Request request : list) {
+                Date endDate = format.parse(request.getEndDate());
+                System.out.println("[+] request end date: " + endDate);
+                if ((!endDate.before(currentDate)) && (request.getState() != false))
+                    result.add(request);
+               
+            }
+            for(Request req: result) System.out.println("[+] " + req);
+            return result;
+        } catch (ParseException e){
+            e.printStackTrace();
+        }
+		return result; 
+    }
 }

@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RequestRepository extends MongoRepository<Request, String>, CrudRepository<Request, String> {
+	
 	Optional<Request> findByRequestId(int requestId);
 	List<Request> findByUserId(String userId);
+	List<Request> findByOrderByEndDateAsc();
+	List<Request> findByOrderByApplicantNumAsc();
 }
