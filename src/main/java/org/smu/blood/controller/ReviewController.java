@@ -79,12 +79,13 @@ public class ReviewController {
 
 				// reviewId에서 DuplicationKey exception 방지 위해 reviewId 설정, 나중에 더 좋은 방법으로 수정 필요
 				id = (int)reviewRepository.count()+1;
-				while(reviewRepository.findByReviewId(id) != null) id += 1;
+				//while(reviewRepository.findByReviewId(id) != null) id += 1;
 
 				// review setting
 				review.setReviewId(id);
 				review.setId(userId);
 				review.setNickname(userNickname);
+				review.setDeleteState(false);
 				System.out.println(review);
 
 				// Review Collection에 사용자 글 document 넣기
@@ -156,7 +157,9 @@ public class ReviewController {
 				System.out.println("[+] get editing review: " + review);
 				
 				// delete review document from Review collection
-				reviewRepository.delete(review);
+				//reviewRepository.delete(review);
+				review.setDeleteState(true);
+				reviewRepository.save(review);
 				return true;
 			}else { // review 없는 경우
 				return false;
@@ -194,13 +197,17 @@ public class ReviewController {
 		return false;
 	}
 	
-	// get only my review list
+	// get only my review list (exclude deleted review) 
 	@GetMapping("review/myList")
 	public List<Review> myReviewList(@RequestHeader String nickname){
 		System.out.println("[+] Get all my reviews from Android");
 			
 		List<Review> mylist = reviewRepository.findByNickname(nickname);
-		for(int i=0; i<mylist.size(); i++) System.out.println("review["+i+"]: " + mylist.get(i).toString());
+		
+		for(int i=0; i<mylist.size(); i++) {
+			System.out.println("review["+i+"]: " + mylist.get(i).toString());
+			if(mylist.get(i).getDeleteState() == true) mylist.remove(i);
+		}
 		return mylist;
 	}
 		

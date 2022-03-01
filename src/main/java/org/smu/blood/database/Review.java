@@ -13,9 +13,10 @@ public class Review {
 	private String writeTime;
 	private int likeNum;
 	private int commentCount;
+	private boolean deleteState;
 	
 	public Review() {}
-	public Review(String userId, String nickname, String title, String writeTime, String contents, int likeNum, int commentCount) {
+	public Review(String userId, String nickname, String title, String writeTime, String contents, int likeNum, int commentCount, boolean deleteState) {
 		this.userId = userId;
 		this.nickname = nickname;
 		this.title = title;
@@ -23,6 +24,7 @@ public class Review {
 		this.writeTime = writeTime;
 		this.likeNum = likeNum;
 		this.commentCount = commentCount;
+		this.deleteState = deleteState;
 	}
 	public int getReviewId() { return reviewId; }
 	public String getId() { return userId; }
@@ -32,6 +34,7 @@ public class Review {
 	public String getWriteTime() { return writeTime; }
 	public int getLikeNum() { return likeNum; }
 	public int getCommentCount() { return commentCount; }
+	public boolean getDeleteState() { return deleteState; }
 	
 	public void setReviewId(int value) { reviewId = value; }
 	public void setId(String value) { userId = value; }
@@ -41,8 +44,9 @@ public class Review {
 	public void setContents(String value) { contents = value; }
 	public void setLikeNum(int value) { likeNum = value; }
 	public void setCommentCount(int value) { commentCount = value; }
+	public void setDeleteState(boolean value) { deleteState = value; }
 	
 	public String toString() {
-		return String.format("Review[reviewId: %d, userId: %s, nickname: %s, title: %s, writeTime: %s, contents: %s, likeNum: %d, commentCount: %d]", reviewId, userId, nickname, title, writeTime, contents, likeNum, commentCount);
+		return String.format("Review[reviewId: %d, userId: %s, nickname: %s, title: %s, writeTime: %s, contents: %s, likeNum: %d, commentCount: %d, deleteStaet: %b]", reviewId, userId, nickname, title, writeTime, contents, likeNum, commentCount, deleteState);
 	}
 }
