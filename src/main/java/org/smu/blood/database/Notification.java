@@ -3,7 +3,7 @@ package org.smu.blood.database;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "Alert")
+@Document(collection = "Notification")
 public class Notification {
     @Id private String userId;
     private String token;
@@ -25,6 +25,6 @@ public class Notification {
 
     @Override
     public String toString() {
-        return "Alert{" + "userId='" + userId + ',' + ", token='" + token + ',' + '}';
+        return "Notification{" + "userId='" + userId + ',' + ", token='" + token + ',' + '}';
     }
 }
