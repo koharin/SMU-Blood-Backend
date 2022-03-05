@@ -3,6 +3,8 @@ package org.smu.blood.controller;
 import java.util.HashMap;
 import java.util.Optional;
 
+import org.smu.blood.database.Notification;
+import org.smu.blood.database.NotificationRepository;
 import org.smu.blood.database.User;
 import org.smu.blood.database.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 //import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @EnableMongoRepositories(basePackages="org.smu.blood")
@@ -18,10 +21,12 @@ public class SignUpController{
 
 	@Autowired
 	private UserRepository repository;
+	@Autowired
+	private NotificationRepository notificationRepository;
 	
 	// 회원가입
 	@PostMapping("signUp")
-	private HashMap<String, Integer> SignUp(@RequestBody User user){
+	private HashMap<String, Integer> SignUp(@RequestHeader String token, @RequestBody User user){
 		HashMap<String,Integer> result = new HashMap<>();
 		System.out.println("[+] Connection from Android");
 		System.out.println("[+] " + user.toString());
@@ -42,6 +47,11 @@ public class SignUpController{
 			// MongoDB collection에 user document 생성
 			repository.insert(user);
 			result.put("create", 1);
+
+			// save FCM registration token
+			Notification notification = new Notification(user.getId(), token, false);
+			System.out.println("[+] user alert entity: " + notification);
+			notificationRepository.insert(notification);
 		}
 		if(!result.containsKey("sameId")) result.put("sameId", 0);
 		if(!result.containsKey("sameNickname")) result.put("sameNickname", 0);
