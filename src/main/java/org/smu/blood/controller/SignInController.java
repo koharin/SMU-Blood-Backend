@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import org.smu.blood.api.JWTService;
+import org.smu.blood.database.FCMToken;
+import org.smu.blood.database.FCMTokenRepository;
 import org.smu.blood.database.User;
 import org.smu.blood.database.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,8 @@ public class SignInController {
 	private MongoTemplate mongoTemplate;
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	private FCMTokenRepository fcmTokenRepository;
 	@Autowired
 	JWTService jwtService;
 	
@@ -87,5 +91,25 @@ public class SignInController {
 			
 			return user;
 		}
+	}
+
+	// save FCM Token
+	@PostMapping("signIn/saveFCMToken")
+	public int saveFCMToken(@RequestHeader String token, @RequestBody String fcmToken){
+		System.out.println("[+] Save FCM token request from Android");
+		System.out.println("[+] token: " + token + "FCM token: " + fcmToken);
+
+		if(jwtService.checkTokenExp(token)){
+			String userId = jwtService.getClaim(token).get("id").toString();
+			System.out.println("[+] userId: " + userId);
+
+			FCMToken newToken = new FCMToken(userId, fcmToken);
+			System.out.println("[+] FCM Token: " + newToken);
+			fcmTokenRepository.save(newToken);
+			return 200;
+		}else{
+			System.out.println("[+] Invalid token");
+		}
+		return 401;
 	}
 }

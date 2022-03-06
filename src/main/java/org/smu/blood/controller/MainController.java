@@ -27,6 +27,8 @@ public class MainController {
     ApplyRepository applyRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    NotificationRepository notificationRepository;
 
     // Request Register request
     @PostMapping("main/registerRequest")
@@ -69,7 +71,7 @@ public class MainController {
             for (Request request : list) {
                 Date endDate = format.parse(request.getEndDate());
                 System.out.println("[+] request end date: " + endDate);
-                if ((!endDate.before(currentDate)) && (request.getState() != false))
+                if ((!endDate.before(currentDate)) && (request.getState()))
                     result.add(request);
                
             }
@@ -116,6 +118,11 @@ public class MainController {
             	// update request document in Request collection
             	requestRepository.save(request);
             	System.out.println("[+] request info for apply(after update): " + request);
+
+                // save notification state
+                Notification notification = new Notification((int) notificationRepository.count()+1, request.getRequestId(), request.getUserId(), apply.getApplyDate(),true);
+                notificationRepository.save(notification);
+                System.out.println("[+] updated: " + notification);
         
             	return 200;
             }else {
@@ -125,6 +132,7 @@ public class MainController {
         // no request info or invalid token
         return 400;
     }
+
     // order request list by endDate
     @GetMapping("main/list/endDate")
     public List<Request> dateSort(){
@@ -143,7 +151,7 @@ public class MainController {
             for (Request request : list) {
                 Date endDate = format.parse(request.getEndDate());
                 System.out.println("[+] request end date: " + endDate);
-                if ((!endDate.before(currentDate)) && (request.getState() != false))
+                if ((!endDate.before(currentDate)) && (request.getState()))
                     result.add(request);
                
             }
@@ -173,7 +181,7 @@ public class MainController {
             for (Request request : list) {
                 Date endDate = format.parse(request.getEndDate());
                 System.out.println("[+] request end date: " + endDate);
-                if ((!endDate.before(currentDate)) && (request.getState() != false))
+                if ((!endDate.before(currentDate)) && (request.getState()))
                     result.add(request);
                
             }
@@ -183,5 +191,31 @@ public class MainController {
             e.printStackTrace();
         }
 		return result; 
+    }
+
+    // return request if user is notification state
+    @GetMapping("main/checkNotification")
+    public boolean checkNotification(@RequestHeader String token){
+        System.out.println("[+] check notice from android");
+        System.out.println("token: " + token);
+
+        if(jwtService.checkTokenExp(token)){
+            // token에서 userId 가져오기
+            String userId = jwtService.getClaim(token).get("id").toString();
+            System.out.println("[+] userId from token: " + userId);
+
+            List<Notification> list = notificationRepository.findByUserId(userId);
+            if(list.size() > 0){
+                for(int i=0; i<list.size(); i++){
+                    if(list.get(i).getNotState())
+                        return true;
+                }
+            }else{
+                System.out.println("[+] no notification entity for user");
+            }
+        }else{
+            System.out.println("[+] invalid token");
+        }
+        return false;
     }
 }

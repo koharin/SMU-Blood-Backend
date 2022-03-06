@@ -21,14 +21,12 @@ public class SignUpController{
 
 	@Autowired
 	private UserRepository repository;
-	@Autowired
-	private NotificationRepository notificationRepository;
 	
 	// 회원가입
 	@PostMapping("signUp")
-	private HashMap<String, Integer> SignUp(@RequestHeader String token, @RequestBody User user){
+	private HashMap<String, Integer> SignUp(@RequestBody User user){
 		HashMap<String,Integer> result = new HashMap<>();
-		System.out.println("[+] Connection from Android");
+		System.out.println("[+] User creation request from Android");
 		System.out.println("[+] " + user.toString());
 		// id 중복 체크
 		if(!repository.findById(user.getId()).equals(Optional.empty())) {
@@ -47,11 +45,6 @@ public class SignUpController{
 			// MongoDB collection에 user document 생성
 			repository.insert(user);
 			result.put("create", 1);
-
-			// save FCM registration token
-			Notification notification = new Notification(user.getId(), token, false);
-			System.out.println("[+] user alert entity: " + notification);
-			notificationRepository.insert(notification);
 		}
 		if(!result.containsKey("sameId")) result.put("sameId", 0);
 		if(!result.containsKey("sameNickname")) result.put("sameNickname", 0);
