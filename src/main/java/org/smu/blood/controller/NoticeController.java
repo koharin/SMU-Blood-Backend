@@ -152,24 +152,41 @@ public class NoticeController {
 
     @PostMapping("notice/sendPush")
     public String sendPush(@RequestBody int requestId) throws Exception{
+        System.out.println("[+] send fcm push notification from server to android");
+
         if(requestRepository.findByRequestId(requestId).isPresent()){
-            String userId = requestRepository.findByRequestId(requestId).get().getUserId();
-            System.out.println("[+] userId: " + userId);
+            Request request = requestRepository.findByRequestId(requestId).get();
+            String userId = request.getUserId();
+            System.out.println("[+] userId from request: " + userId);
 
             if(fcmTokenRepository.findById(userId).isPresent()){
-                String registrationToken = fcmTokenRepository.findById(userId).get().getToken();
+                FCMToken fcmToken = fcmTokenRepository.findById(userId).get();
+                System.out.println("[+] user fcmToken: " + fcmToken);
+                String registrationToken = fcmToken.getToken();
 
                 System.out.println("[+] fcmToken: " + registrationToken);
 
                 // initialize Admin SDK using OAuth 2.0 refresh token
                 FileInputStream refreshToken = new FileInputStream("/Users/koharin/FCMPush/blring-push-firebase-adminsdk-j3ftj-bad95bfde3.json");
-                FirebaseOptions options = FirebaseOptions.builder()
-                        .setCredentials(GoogleCredentials.fromStream(refreshToken))
-                        .setProjectId("538005555008")
-                        .build();
-                FirebaseApp.initializeApp(options);
+                // to avoid multiple initialize app
+                FirebaseApp firebaseApp = null;
+                List<FirebaseApp> firebaseApps = FirebaseApp.getApps();
+                if(firebaseApps != null && !firebaseApps.isEmpty()){
+                    for(FirebaseApp app: firebaseApps){
+                        if(app.getName().equals(FirebaseApp.DEFAULT_APP_NAME))
+                            firebaseApp = app;
+                    }
+                }else{
+                    FirebaseOptions options = FirebaseOptions.builder()
+                            .setCredentials(GoogleCredentials.fromStream(refreshToken))
+                            .setProjectId("538005555008")
+                            .build();
+                    firebaseApp = FirebaseApp.initializeApp(options);
+                }
 
-                // android message
+                System.out.println("[+] firebaseapp: " + firebaseApp);
+
+                // build android message
                 Message message = Message.builder()
                         .setAndroidConfig(AndroidConfig.builder()
                                 .setTtl(3600*1000)
@@ -183,16 +200,36 @@ public class NoticeController {
                                         .setIcon("@drawable/bling")
                                         .build())
                                 .build())
+                        .putData("requestId", Integer.toString(request.getRequestId())) // request 식별 정보(requestId) 넣기
                         .setToken(registrationToken) // 요청자의 디바이스에 대한 registration token으로 설정
                         .build();
+                System.out.println("[+] message to send: " + message);
                 // Send a message to the device corresponding to the provided registration token.
                 String response = FirebaseMessaging.getInstance().send(message);
                 // Response is a message ID string.
                 System.out.println("[+] Successfully sent message: " + response);
                 return response;
+            }else{
+                System.out.println("[-] no fcm token for user");
             }
         }else{
             System.out.println("[-] invalid");
+        }
+        return null;
+    }
+
+    // get request (for notice click event)
+    @PostMapping("notice/getRequest")
+    public Request getRequest(@RequestBody int requestId){
+        System.out.println("\n[+] get request for notice click event");
+
+        if(requestRepository.findByRequestId(requestId).isPresent()){
+            Request request = requestRepository.findByRequestId(requestId).get();
+            System.out.println("[+] " + request);
+
+            return request;
+        }else{
+            System.out.println("[-] no request info");
         }
         return null;
     }

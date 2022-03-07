@@ -92,11 +92,11 @@ public class SignInController {
 			return user;
 		}
 	}
-
 	// save FCM Token
-	@PostMapping("signIn/saveFCMToken")
+	@PostMapping("fcm/saveToken")
 	public int saveFCMToken(@RequestHeader String token, @RequestBody String fcmToken){
 		System.out.println("[+] Save FCM token request from Android");
+		fcmToken = fcmToken.substring(1, fcmToken.length()-1);
 		System.out.println("[+] token: " + token + "FCM token: " + fcmToken);
 
 		if(jwtService.checkTokenExp(token)){
