@@ -120,7 +120,7 @@ public class MainController {
             	System.out.println("[+] request info for apply(after update): " + request);
 
                 // save notification state
-                Notification notification = new Notification((int) notificationRepository.count()+1, request.getRequestId(), request.getUserId(), apply.getApplyDate(),true);
+                Notification notification = new Notification((int) notificationRepository.count()+1, request.getRequestId(), request.getUserId(), apply.getApplyDate(),true, false);
                 notificationRepository.save(notification);
                 System.out.println("[+] updated: " + notification);
         
@@ -205,9 +205,11 @@ public class MainController {
             System.out.println("[+] userId from token: " + userId);
 
             List<Notification> list = notificationRepository.findByUserId(userId);
+            System.out.println("[+] list size: " + list.size());
             if(list.size() > 0){
-                for(int i=0; i<list.size(); i++){
-                    if(list.get(i).getNotState())
+                for (Notification notification : list) {
+                    System.out.println("[+] " + notification);
+                    if (notification.getNotState())
                         return true;
                 }
             }else{
