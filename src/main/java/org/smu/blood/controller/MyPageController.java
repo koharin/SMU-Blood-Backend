@@ -143,7 +143,7 @@ public class MyPageController {
             
             // find request list by userId
             List<Request> requestlist = requestRepository.findByUserId(userId);
-            for(int i=0; i<requestlist.size(); i++) System.out.println("[+] Request["+i+"]: " + requestlist.get(i));
+            for(Request request: requestlist) System.out.println("[+] Request["+requestlist.indexOf(request)+"]: " + request);
             
             return requestlist;
     	}
@@ -162,7 +162,7 @@ public class MyPageController {
             System.out.println("[+] userId from token: " + userId);
             
             List<Apply> applylist = applyRepository.findByRequestId(requestId);
-        	for(int i=0; i<applylist.size(); i++) System.out.println("[+] Apply["+i+"]: " + applylist.get(i));
+        	for(Apply apply: applylist) System.out.println("[+] Apply["+applylist.indexOf(apply)+"]: " + apply);
         	
         	return applylist;
     	}
@@ -181,7 +181,7 @@ public class MyPageController {
             
             // find apply list by userId
             List<Apply> applyList = applyRepository.findByUserId(userId);
-            for(int i=0; i<applyList.size(); i++) System.out.println("[+] Apply["+i+"]: " + applyList.get(i));
+			for(Apply apply: applyList) System.out.println("[+] Apply["+applyList.indexOf(apply)+"]: " + apply);
             
             return applyList;
         }else {
@@ -201,7 +201,7 @@ public class MyPageController {
             
             if(requestRepository.findByRequestId(requestId).isPresent()) {
             	Request requestInfo = requestRepository.findByRequestId(requestId).get();
-            	System.out.println("[+] request info of my apply: " + requestInfo.toString());
+            	System.out.println("[+] request info of my apply: " + requestInfo);
             	
             	return requestInfo;
             }else {
@@ -223,7 +223,7 @@ public class MyPageController {
             
             if(requestRepository.findByRequestId(requestId).isPresent()) {
             	Request requestInfo = requestRepository.findByRequestId(requestId).get();
-            	System.out.println("[+] request info of my apply: " + requestInfo.toString());
+            	System.out.println("[+] request info of my apply: " + requestInfo);
             	
             	// set state to false and update change
             	requestInfo.setState(false);
