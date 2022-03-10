@@ -1,14 +1,10 @@
 package org.smu.blood.api;
 
 import com.google.firebase.messaging.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class FCMService {
-
-    //Logger logger = LoggerFactory.getLogger(FCMService.class);
 
     // send message to android
     public String sendMessage(int requestId, String registrationToken) throws FirebaseMessagingException {
@@ -29,7 +25,6 @@ public class FCMService {
                 .build();
 
         System.out.println("[+] message to send: " + message);
-        //logger.info("[+] message to send: " + message);
 
         // Send a message to the device corresponding to the provided registration token.
         String response = FirebaseMessaging.getInstance().send(message);

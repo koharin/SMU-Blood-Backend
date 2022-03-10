@@ -3,8 +3,6 @@ package org.smu.blood.api;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -13,8 +11,6 @@ import java.io.IOException;
 
 @Service
 public class FCMInitializer {
-
-    //Logger logger = LoggerFactory.getLogger(FCMInitializer.class);
 
     @PostConstruct
     public void initialize() throws IOException {
@@ -29,6 +25,5 @@ public class FCMInitializer {
 
         FirebaseApp.initializeApp(options);
         System.out.println("[+] Firebase application initialized");
-        //logger.info("[+] Firebase application initialized");
     }
 }
