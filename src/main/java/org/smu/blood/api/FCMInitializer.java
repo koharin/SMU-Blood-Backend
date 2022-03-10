@@ -14,7 +14,7 @@ import java.io.IOException;
 @Service
 public class FCMInitializer {
 
-    Logger logger = LoggerFactory.getLogger(FCMInitializer.class);
+    //Logger logger = LoggerFactory.getLogger(FCMInitializer.class);
 
     @PostConstruct
     public void initialize() throws IOException {
@@ -28,6 +28,7 @@ public class FCMInitializer {
                 .build();
 
         FirebaseApp.initializeApp(options);
-        logger.info("[+] Firebase application initialized");
+        System.out.println("[+] Firebase application initialized");
+        //logger.info("[+] Firebase application initialized");
     }
 }

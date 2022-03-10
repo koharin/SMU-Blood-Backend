@@ -170,7 +170,8 @@ public class NoticeController {
                 System.out.println("[+] fcmToken: " + registrationToken);
 
                 // build android message and send message
-                //String response = fcmService.sendMessage(request.getRequestId(), registrationToken);
+                String response = fcmService.sendMessage(request.getRequestId(), registrationToken);
+                /*
                 Message message = Message.builder()
                         .setAndroidConfig(AndroidConfig.builder()
                                 .setTtl(3600*1000)
@@ -189,8 +190,7 @@ public class NoticeController {
 
                 System.out.println("[+] message to send: " + message);
 
-                // Send a message to the device corresponding to the provided registration token.
-                String response = FirebaseMessaging.getInstance().send(message);
+                 */
 
                 // Response is a message ID string.
                 System.out.println("[+] Successfully sent message: " + response);
