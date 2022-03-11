@@ -16,7 +16,8 @@ public class FCMInitializer {
     public void initialize() throws IOException {
         // initialize Admin SDK using OAuth 2.0 refresh token
 
-        FileInputStream refreshToken = new FileInputStream("/Users/koharin/FCMPush/blring-push-firebase-adminsdk-j3ftj-bad95bfde3.json");
+        //FileInputStream refreshToken = new FileInputStream("/Users/koharin/FCMPush/blring-push-firebase-adminsdk-j3ftj-bad95bfde3.json");
+        FileInputStream refreshToken = new FileInputStream("/home/ubuntu/blring-push-firebase-adminsdk-j3ftj-bad95bfde3.json");
 
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(refreshToken))
