@@ -27,7 +27,7 @@ public class Review {
 		this.deleteState = deleteState;
 	}
 	public int getReviewId() { return reviewId; }
-	public String getId() { return userId; }
+	public String getUserId() { return userId; }
 	public String getNickname() { return nickname; }
 	public String getTitle() { return title; }
 	public String getContents() { return contents; }
@@ -37,7 +37,7 @@ public class Review {
 	public boolean getDeleteState() { return deleteState; }
 	
 	public void setReviewId(int value) { reviewId = value; }
-	public void setId(String value) { userId = value; }
+	public void setUserId(String value) { userId = value; }
 	public void setNickname(String value) { nickname = value; }
 	public void setTitle(String value) { title = value; }
 	public void setWriteTime(String value) { writeTime = value; }
