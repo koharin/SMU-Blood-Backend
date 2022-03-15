@@ -213,7 +213,7 @@ public class MyPageController {
     }
     
     // request end
-    @PostMapping("myPage/request/end")
+    @PostMapping("myPage/myRequest/end")
     public int requestEnd(@RequestHeader String token, @RequestBody int requestId) {
     	System.out.println("[+] Set request state to false for request end request");
     	if(jwtService.checkTokenExp(token)){
