@@ -6,13 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.smu.blood.api.JWTService;
-import org.smu.blood.database.Comment;
-import org.smu.blood.database.CommentRepository;
-import org.smu.blood.database.Review;
-import org.smu.blood.database.ReviewLike;
-import org.smu.blood.database.ReviewLikeRepository;
-import org.smu.blood.database.ReviewRepository;
-import org.smu.blood.database.UserRepository;
+import org.smu.blood.database.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,9 +29,9 @@ public class ReviewController {
 	@Autowired
 	JWTService jwtService;
 	
-	// get my nickname
-	@GetMapping(value="review/myNickname", produces="application/json; charset=utf8")
-	public String getMyId(@RequestHeader String token) {
+	// get my user info
+	@GetMapping(value="review/user", produces="application/json; charset=utf8")
+	public User getMyId(@RequestHeader String token) {
 		System.out.println("[+] Get my nickname from Android");
 		System.out.println("[+] token: " + token);
 		
@@ -48,10 +42,10 @@ public class ReviewController {
 			System.out.println("[+] userId from token: " + userId);
 			// userId로 User document 있는 경우
 			if(repository.findById(userId).isPresent()){
-				String userNickname = repository.findById(userId).get().getNickname();
-				System.out.println("[+] userNickname: " + userNickname);
+				User user = repository.findById(userId).get();
+				System.out.println("[+] user: " + user);
 
-				return userNickname;
+				return user;
 			} // 없는 경우
 			else System.out.println("[-] no user info");
 		}else {
@@ -83,7 +77,7 @@ public class ReviewController {
 
 				// review setting
 				review.setReviewId(id);
-				review.setId(userId);
+				review.setUserId(userId);
 				review.setNickname(userNickname);
 				review.setDeleteState(false);
 				System.out.println(review);
@@ -132,6 +126,7 @@ public class ReviewController {
 				reviewRepository.save(review);
 				return true;
 			}else { // review 없는 경우
+				System.out.println("[-] No review found");
 				return false;
 			}
 		}else {
@@ -206,7 +201,7 @@ public class ReviewController {
 		
 		for(int i=0; i<mylist.size(); i++) {
 			System.out.println("review["+i+"]: " + mylist.get(i).toString());
-			if(mylist.get(i).getDeleteState() == true) mylist.remove(i);
+			if(mylist.get(i).getDeleteState()) mylist.remove(i);
 		}
 		return mylist;
 	}
@@ -224,7 +219,7 @@ public class ReviewController {
 				// commentId에서 DuplicationKey exception 방지 위해 commentId 설정, 나중에 더 좋은 방법으로 수정 필요
 				int id = (int)commentRepository.count()+1;
 				while(commentRepository.findByCommentId(id) != null) id += 1;
-				Comment commentInfo = new Comment(id, review.getReviewId(), requestInfo.get("commentNickname"), requestInfo.get("commentTime"), requestInfo.get("comment"));
+				Comment commentInfo = new Comment(id, review.getReviewId(), requestInfo.get("userId"), requestInfo.get("commentNickname"), requestInfo.get("commentTime"), requestInfo.get("comment"));
 				System.out.println("[+] Add Comment: " + commentInfo);
 				
 				// save review comment
@@ -246,10 +241,10 @@ public class ReviewController {
 	
 	// get comment list of review
 	@PostMapping("review/commentList")
-	public List<Comment> commentList(@RequestBody HashMap<String,String> reviewInfo){
-		System.out.println("[+] Get all reviews from Android");
-		// find review document by editing review's nickname and writeTime
-		Review review = reviewRepository.findByNicknameAndWriteTime(reviewInfo.get("reviewNickname"), reviewInfo.get("reviewTime"));
+	public List<Comment> commentList(@RequestBody int reviewId){
+		System.out.println("[+] Get all comments of review" + reviewId + " from Android");
+		// find review document by reviewId
+		Review review = reviewRepository.findByReviewId((reviewId));
 		
 		List<Comment> list = commentRepository.findByReviewId(review.getReviewId());
 		for(int i=0; i<list.size(); i++) System.out.println("Comment["+i+"]: " + list.get(i).toString());
@@ -281,11 +276,11 @@ public class ReviewController {
 	
 	// delete comment
 	@PostMapping("review/deleteComment")
-	public boolean deleteComment(@RequestHeader String token, @RequestBody HashMap<String,String> deleteInfo) {
+	public boolean deleteComment(@RequestHeader String token, @RequestBody int commentId) {
 		System.out.println("[+] delete comment request from Android");
 		
 		if(jwtService.checkTokenExp(token)) {
-			Comment comment = commentRepository.findByCommentId(Integer.parseInt(deleteInfo.get("commentId")));
+			Comment comment = commentRepository.findByCommentId(commentId);
 			
 			if(comment != null) {
 				System.out.println("[+] "+ comment);
