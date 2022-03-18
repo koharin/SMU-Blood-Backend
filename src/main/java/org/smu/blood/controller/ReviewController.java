@@ -319,12 +319,15 @@ public class ReviewController {
 				
 				// save reviewLike in ReviewLike collection
 				ReviewLike reviewLike = reviewLikeRepository.findByReviewIdAndUserId(review.getReviewId(), userId);
-				if(reviewLike != null) {
+				if(reviewLike != null) { // 이미 있는 경우
 					System.out.println("[+] get reviewLike: " + reviewLike);
 
-					// 이미 true일 때는 새로 들어온 state가 false일 때만 likeNum 변화
+					// 이미 true일 때는 새로 들어온 state가 false일 때만 likeNum-1
 					if((reviewLike.getHeartState()) && (!Boolean.parseBoolean(reviewInfo.get("heartState"))))
 						review.setLikeNum(review.getLikeNum()-1);
+					// 이미 false일 때 새로 들어온 state가 true이면 likeNum+1
+					if(!reviewLike.getHeartState() && Boolean.parseBoolean(reviewInfo.get("heartState")))
+						review.setLikeNum(review.getLikeNum()+1);
 					
 					reviewLike.setHeartState(Boolean.parseBoolean(reviewInfo.get("heartState")));
 				}else {
