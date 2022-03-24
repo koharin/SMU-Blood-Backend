@@ -98,7 +98,7 @@ public class ReviewController {
 	public List<Review> reviewList(){
 		System.out.println("[+] Get all reviews from Android");
 		
-		List<Review> list = reviewRepository.findAll();
+		List<Review> list = reviewRepository.findByOrderByWriteTimeDesc();
 		for(int i=0; i<list.size(); i++) System.out.println("review["+i+"]: " + list.get(i).toString());
 		return list;
 	}
@@ -190,20 +190,6 @@ public class ReviewController {
 		}
 		// review auth error or invalid token
 		return false;
-	}
-	
-	// get only my review list (exclude deleted review) 
-	@GetMapping("review/myList")
-	public List<Review> myReviewList(@RequestHeader String nickname){
-		System.out.println("[+] Get all my reviews from Android");
-			
-		List<Review> mylist = reviewRepository.findByNickname(nickname);
-		
-		for(int i=0; i<mylist.size(); i++) {
-			System.out.println("review["+i+"]: " + mylist.get(i).toString());
-			if(mylist.get(i).getDeleteState()) mylist.remove(i);
-		}
-		return mylist;
 	}
 		
 	// add comment to review

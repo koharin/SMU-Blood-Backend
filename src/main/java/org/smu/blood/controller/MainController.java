@@ -58,7 +58,7 @@ public class MainController {
     public List<Request> allRequestList() {
     	System.out.println("[+] Get list of request");
 
-        List<Request> list = requestRepository.findAll();
+        List<Request> list = requestRepository.findByOrderByRegisterTimeDesc();
         List<Request> result = new ArrayList<>();
 
     	try{

@@ -14,4 +14,5 @@ public interface RequestRepository extends MongoRepository<Request, String>, Cru
 	List<Request> findByUserId(String userId);
 	List<Request> findByOrderByEndDateAsc();
 	List<Request> findByOrderByApplicantNumAsc();
+	List<Request> findByOrderByRegisterTimeDesc();
 }

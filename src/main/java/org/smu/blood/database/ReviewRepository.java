@@ -10,10 +10,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ReviewRepository extends MongoRepository<Review,String>, CrudRepository<Review,String>{
-	Review findByNicknameAndWriteTime(String nickname, String writeTime);
-	List<Review> findByNickname(String nickname);
+
 	Review findByReviewId(int reviewId);
 	Optional<Review> findByReviewIdAndUserId(int reviewId, String userId);
+	List<Review> findByOrderByWriteTimeDesc();
 	
 	@Query("{'deleteState': false}")
 	List<Review> findAll();
